@@ -1,10 +1,9 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # Esegue la pipeline ogni giorno alle 2:00 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
 
 jobs:
   build-and-test:
@@ -24,6 +23,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run model tests
         run: |
           python tests/test_model.py
+
+      - name: Retrain model
+        run: |
+          python src/retrain.py

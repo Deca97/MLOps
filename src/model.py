@@ -1,14 +1,23 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+import os
 
-MODEL_NAME = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+BASE_MODEL = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+FINE_TUNED_MODEL_PATH = "models/twitter-roberta-finetuned"
 
 def load_model():
     """
-    Carica il modello pre-addestrato HuggingFace per l'analisi del sentiment.
+    Carica il modello più aggiornato:
+    - Se esiste il modello fine-tuned, lo carica
+    - Altrimenti carica il modello pre-addestrato HuggingFace
     """
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    if os.path.exists(FINE_TUNED_MODEL_PATH):
+        tokenizer = AutoTokenizer.from_pretrained(FINE_TUNED_MODEL_PATH)
+        model = AutoModelForSequenceClassification.from_pretrained(FINE_TUNED_MODEL_PATH)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+        model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL)
+
     model.eval()
     return tokenizer, model
 
