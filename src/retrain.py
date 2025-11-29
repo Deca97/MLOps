@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset
 import torch
 import os
@@ -19,11 +19,15 @@ def retrain_model():
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
+    # Tokenizzazione con padding fisso e truncation
     def tokenize_function(examples):
-        return tokenizer(examples["text"], padding="max_length", truncation=True)
+        return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
 
     tokenized_train = train_dataset.map(tokenize_function, batched=True)
     tokenized_train.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
+
+    # Data collator per batch dinamici
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # Impostazioni trainer
     training_args = TrainingArguments(
@@ -38,13 +42,14 @@ def retrain_model():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=tokenized_train
+        train_dataset=tokenized_train,
+        data_collator=data_collator
     )
 
     # Fine-tuning
     trainer.train()
 
-    # Salvataggio modello
+    # Salvataggio modello e tokenizer
     os.makedirs(MODEL_SAVE_PATH, exist_ok=True)
     model.save_pretrained(MODEL_SAVE_PATH)
     tokenizer.save_pretrained(MODEL_SAVE_PATH)
