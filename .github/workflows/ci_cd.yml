@@ -4,6 +4,7 @@ on:
   # Esegue la pipeline ogni giorno alle 2:00 AM UTC
   schedule:
     - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   build-and-test:
