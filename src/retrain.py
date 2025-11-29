@@ -32,8 +32,7 @@ def retrain_model():
         num_train_epochs=1,
         logging_steps=10,
         save_strategy="epoch",
-        learning_rate=2e-5,
-        evaluation_strategy="no"
+        learning_rate=2e-5
     )
 
     trainer = Trainer(
