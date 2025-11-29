@@ -13,7 +13,7 @@ def retrain_model():
     """
     # Carica dataset
     dataset = load_dataset("tweet_eval", "sentiment")
-    train_dataset = dataset["train"]
+    train_dataset = dataset["train"].select(range(1000))
     
     # Tokenizer e modello
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -21,7 +21,7 @@ def retrain_model():
 
     # Tokenizzazione con padding fisso e truncation
     def tokenize_function(examples):
-        return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+        return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=64)
 
     tokenized_train = train_dataset.map(tokenize_function, batched=True)
     tokenized_train.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
@@ -32,9 +32,9 @@ def retrain_model():
     # Impostazioni trainer
     training_args = TrainingArguments(
         output_dir=MODEL_SAVE_PATH,
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=4,
         num_train_epochs=1,
-        logging_steps=10,
+        logging_steps=100,
         save_strategy="epoch",
         learning_rate=2e-5
     )
