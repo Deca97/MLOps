@@ -2,9 +2,11 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trai
 from datasets import load_dataset
 import torch
 import os
+import random
 
 MODEL_NAME = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 MODEL_SAVE_PATH = "models/twitter-roberta-finetuned"
+SAMPLE_SIZE = 1000
 
 def retrain_model():
     """
@@ -13,7 +15,11 @@ def retrain_model():
     """
     # Carica dataset
     dataset = load_dataset("tweet_eval", "sentiment")
-    train_dataset = dataset["train"].select(range(1000))
+    train_dataset_full = dataset["train"]
+
+    # Campiona casualmente SAMPLE_SIZE record 
+    indices = random.sample(range(len(train_dataset_full)), SAMPLE_SIZE) 
+    train_dataset = train_dataset_full.select(indices)
     
     # Tokenizer e modello
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)

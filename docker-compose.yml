@@ -1,0 +1,14 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      # Plugin SQLite per Grafana
+      - GF_INSTALL_PLUGINS=frser-sqlite-datasource
+    volumes:
+      # Monta la cartella dati e il file DB
+      - ./data:/var/lib/grafana/data
+      - ./data/sentiment.db:/var/lib/grafana/sentiment.db
+    restart: unless-stopped
