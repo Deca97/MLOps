@@ -4,4 +4,4 @@ datasets
 matplotlib
 pandas
 accelerate>=0.26.0
-sklearn
+scikit-learn
