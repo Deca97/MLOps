@@ -1,6 +1,11 @@
 import sqlite3
 import os
 from datetime import datetime
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.model import predict_sentiment
 from src.data_loader import load_sentiment_dataset
 from sklearn.metrics import f1_score
