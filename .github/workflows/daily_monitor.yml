@@ -18,4 +18,4 @@ jobs:
           pip install -r requirements.txt
       - run: |
           python tests/test_model.py
-          python src/monitor.py
+          python tests/monitor.py
