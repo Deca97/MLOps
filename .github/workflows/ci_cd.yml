@@ -1,37 +1,53 @@
 name: CI/CD Pipeline
 
 on:
-  # Esegue la pipeline alle 2:00 AM UTC
+  # Monitoraggio e test giornaliero
   schedule:
-- cron: '0 2 * * *' # monitoraggio e test giornaliero alle 2:00 AM UTC
-- cron: '0 3 * * 1' # retraining settimanale il lunedì alle 3:00 AM UTC
-workflow_dispatch:
+    - cron: '0 2 * * *' # ogni giorno alle 2:00 AM UTC
+  # Retraining settimanale
+    - cron: '0 3 * * 1' # ogni lunedì alle 3:00 AM UTC
+  workflow_dispatch:
 
 jobs:
-build-and-test:
-runs-on: ubuntu-latest
-
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v3
-
-  - name: Set up Python
-    uses: actions/setup-python@v4
-    with:
-      python-version: "3.11"
-
-  - name: Install dependencies
-    run: |
-      python -m pip install --upgrade pip
-      pip install -r requirements.txt
-
-  - name: Run model tests and monitoring
+  daily-monitor-test:
     if: github.event_name == 'schedule' && github.event.schedule == '0 2 * * *'
-    run: |
-      python tests/test_model.py
-      python src/monitor.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  - name: Retrain model
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run model tests and monitoring
+        run: |
+          python tests/test_model.py
+          python src/monitor.py
+
+  weekly-retrain:
     if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 1'
-    run: |
-      python src/retrain.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Retrain model
+        run: |
+          python src/retrain.py
